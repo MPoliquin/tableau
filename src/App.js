@@ -7,8 +7,24 @@ export default class App {
 	 * Méthode principale. Sera typiquement appelée après le chargement de la page.
 	 */
 	static async main() {
-		this.stats = document.querySelector("table.stats");
-		var labels = document.querySelectorAll("table.stats>thead th");
+		this.domstats = document.querySelector("table.stats");
+		this.initEquipe();
+		this.initHeader();
+	}
+
+	static initEquipe(){
+		this.equipes = Array.from(document.querySelectorAll("table.stats>tbody th"));
+		this.equipes.forEach((equipe) => {
+			equipe.addEventListener("click", e => {
+				console.log(e.currentTarget.parentNode.equipe.equipe);
+			})
+		})
+		return this.equipes;
+	}
+
+	static initHeader(){
+		// Array.from() : transforme en tableau
+		var labels = Array.from(document.querySelectorAll("table.stats>thead th"));
 		labels.forEach((label) => {
 			label.addEventListener("click", e => {
 				if (e.currentTarget.classList.contains("asc")) {
@@ -24,8 +40,16 @@ export default class App {
 					});
 					e.currentTarget.classList.add("asc");
 				}
+				var colonne = e.currentTarget.colonne;
+				//alert(colonne.titre);
+				var Trs = Array.from(document.querySelectorAll("table.stats>tbody tr"));
+				var idColonne = e.currentTarget.getAttribute("data-for");
+				Trs.forEach((tr) => {
+					console.log(tr.equipe[idColonne]);
+				})
 			});
 		});
+
 	}
 	/**
 	 * Méthode init. Charge un tableau avant le main.
@@ -81,6 +105,7 @@ export default class App {
 		for (let k in this.stats.colonnes) {
 			var colonne = this.stats.colonnes[k];
 			var cellule = rangee.appendChild(document.createElement("th"));
+			cellule.colonne = colonne;
 			cellule.setAttribute("title", colonne.titre);
 			cellule.setAttribute("data-for", k);
 			cellule.appendChild(document.createTextNode(colonne.label));
@@ -100,6 +125,7 @@ export default class App {
 		for (let k in this.stats.equipes) {
 			var equipe = this.stats.equipes[k];
 			var rangee = resultat.appendChild(document.createElement("tr"));
+			rangee.equipe = equipe;
 			for (let c in this.stats.colonnes) {
 				rangee.appendChild(this.dom_cellule(this.stats.colonnes[c], equipe[c]));
 			}
